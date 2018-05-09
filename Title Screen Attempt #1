@@ -34,7 +34,7 @@ struct snakeBlock{
 
 void gotoxy(int *xptr, int *yptr) //Set snake location and snake color
 {
-  COORD coord={*xptr,*yptr};
+  COORD coord={*xptr,*yptr};      //Create a coord variable to be able to use the SetConsoleCursorPosition
   SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5);
   SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
@@ -92,10 +92,10 @@ bool checkLose(int x, int y,vector <snakeBlock>&snake, int dif)
         snakeBlock newSnake;
         for(int num = 0; num <= 1*dif; num++ )     //When the snake comes incontact with the apple then it will grow.
         {
-            newSnake.x=snake[snake.size()-1].x;
+            newSnake.x=snake[snake.size()-1].x;   //sets the x and y location of the new blocks to tail of the snake
             newSnake.y=snake[snake.size()-1].y;
-            snake.push_back(newSnake);
-            fileScore++;     //The snake grows by having the amount of spaces it takes up on the board  be the amount of places that are in the newSnake vector.
+            snake.push_back(newSnake);            //The snake grows by having the amount of spaces it takes up on the board  be the amount of places that are in the newSnake vector.
+            fileScore++;     
         }
         int rx,ry;
         do{
@@ -120,26 +120,61 @@ void snakeInit(int x,int y ,vector<snakeBlock> &snake)
 bool snakeMove(vector<snakeBlock>&snake,short dire[2],int dif)
 {
     int oldx,oldy,x,y; //variables to hold where the snake is on the plane
-    gotoxy(&snake[snake.size()-1].x,&snake[snake.size()-1].y);  //Sets the cursor to where the snake was
-    cout<<" ";  //displays a blank space
-    oldx=snake[0].x;  //finds the back of the snake
-    oldy=snake[0].y;
-    snake[0].x+=dire[0];  // horizontal location is changed based on the x value in dire
-    snake[0].y+=dire[1];  // vertical location is changed based on the y value in dire
-    gotoxy(&snake[0].x,&snake[0].y);  //Sets the cursor to where the snake will be
-    cout<<char(219);                //Displays the block
+    gotoxy(&snake[snake.size()-1].x,&snake[snake.size()-1].y);  //Sets the cursor to where the tail of the snake is
+    cout<<" ";  //displays a blank space where the tail used to be.                            -|
+                      //                                                                        |
+    oldx=snake[0].x;  //finds the head of the snake                                             |
+    oldy=snake[0].y;  //                                                                        |
+    //                                                                                          |
+    //oldx and oldy hold the x and y values of the head of the snake                            |
+    //                                                                                          |
+    snake[0].x+=dire[0];  // horizontal location is changed based on the x value in dire        |       the snake ends have been outputted
+    snake[0].y+=dire[1];  // vertical location is changed based on the y value in dire          |
+    //                                                                                          |
+    //snake[0].x and snake[0].y now hold the new location of the head.                          |
+    //                                                                                          |
+    gotoxy(&snake[0].x,&snake[0].y);  //Sets the cursor to where the snake will be              |
+    cout<<char(219);                //Displays the block                                       -|
     if (snake.size()>1)
     {
-        for (int i = 1;i<snake.size();i++)// resets the values in each part of the snake vector to be correct with where the snake has moved to
+        for (int i = 1;i<snake.size();i++)//When this loop is run through the new head x and y are set to snake[1] and the old head is set to snake[0],
+                                          //all of the sections of the array hold the location of the previous' old location on the screen
         {
-            x=snake[i].x;   //finds the x location of the head of the snake
-            y=snake[i].y;   //finds the y location of the head of the snake
-            snake[i].x=oldx;    //resets all of the locations back to the back of the old snake
+            x=snake[i].x;   //finds the x location of the back of the snake
+            y=snake[i].y;   //finds the y location of the back of the snake
+            snake[i].x=oldx;    //resets all of the locations back to the head of the old snake
             snake[i].y=oldy;
             oldx=x;         //sets the x and y location of the head to be the back
             oldy=y;
         }
     }
+    /*
+
+    the new head is already displayed
+    the old tail is already removed
+
+    x=snake[0].x;           x and y now hold the location of the new head
+    y=snake[0].y;
+    snake[0].x=oldx;        snake[0] now holds the location of the old head
+    snake[0].y=oldy;
+    oldx=x;                 oldx now holds the location of the new head
+    oldy=y;
+
+    x=snake[1].x;           x and y now hold the location of the next block's old location
+    y=snake[1].y;
+    snake[1].x=oldx;        snake[1] now holds the location of the new head
+    snake[1].y=oldy;
+    oldx=x;                 oldx now holds the location of the snake[1]'s old location
+    oldy=y;
+
+    x=snake[2].x;           x and y now hold the location of the next block's old location
+    y=snake[2].y;
+    snake[2].x=oldx;        snake[2] now holds the location of the previous' block's old location
+    snake[2].y=oldy;
+    oldx=x;                 oldx now holds the location of the snake[2]'s old location
+    oldy=y;
+
+    */
     if (checkLose(snake[0].x,snake[0].y,snake,dif))
         return true;
     return false;
